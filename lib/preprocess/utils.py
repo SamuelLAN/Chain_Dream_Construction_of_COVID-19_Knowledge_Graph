@@ -345,7 +345,7 @@ def convert_list_of_list_token_idx_2_string(list_of_list_token_idx):
     return list(map(lambda x: list(map(str, x)), list_of_list_token_idx))
 
 
-def pipeline(preprocess_pipeline, lan_data_1, lan_data_2=None, params={}, verbose=True):
+def pipeline(preprocess_pipeline, _input, params={}, verbose=True):
     """
     preprocess the data according to the preprocess_pipeline
     :params
@@ -369,7 +369,7 @@ def pipeline(preprocess_pipeline, lan_data_1, lan_data_2=None, params={}, verbos
         verbose (bool): whether or not to print information
     """
     # share variables when applying different preprocess functions
-    result_dict = {**params, 'input_1': lan_data_1, 'input_2': lan_data_2}
+    result_dict = {**params, 'input': _input}
 
     # traverse the pipeline
     for func_dict in preprocess_pipeline:
@@ -573,6 +573,15 @@ def stem(word):
     return __ps.stem(word)
 
 
-def stem_ro(word):
-    return __ss.stem(word)
+def calculate_pos_for_tokens(list_of_tokens):
+    ret = []
+    cur_pos = 0
+    for v in list_of_tokens:
+        end_pos = cur_pos + len(v)
+        ret.append({'token': v, 'start': cur_pos, 'end': end_pos})
+        cur_pos = end_pos
+    return ret
 
+
+def calculate_pos_for_list_of_list_tokens(list_of_list_tokens):
+    return list(map(calculate_pos_for_tokens, list_of_list_tokens))
